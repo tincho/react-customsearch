@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import fetchJSON from './Helpers';
+import fetchJSON from './Helpers/fetchJson.js';
 
 var $$ = document.querySelector.bind(document);
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
