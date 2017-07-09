@@ -1,6 +1,11 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+
 import fetchJSON from './Helpers/fetchJson.js';
+
+import SearchForm from 'SearchForm';
+import SearchResult from 'SearchResult';
+import Pagination from 'Pagination';
 
 var $$ = document.querySelector.bind(document);
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
