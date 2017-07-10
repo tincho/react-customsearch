@@ -17,7 +17,10 @@ export default class SearchApp extends React.Component {
         this.src = props.src;
         this.state = {
             data: [],
-            cols: []
+            cols: [],
+            total: 0,
+            limit: 20,
+            offset: 0
         };
     }
 
@@ -29,7 +32,7 @@ export default class SearchApp extends React.Component {
         fetchJSON(this.src + 'columns/selected').then(cols => this.setState({cols}));
     }
 
-    loadResults() {
+    loadResults(limit = 20, offset = 0) {
 
         let
             thisNode = ReactDOM.findDOMNode(this),
@@ -45,7 +48,7 @@ export default class SearchApp extends React.Component {
             loading: true // @TODO ...SearchResult is loading its data!
         });
 
-        let params = `?q=${q}&type=${type}`;
+        let params = `?q=${q}&type=${type}&limit=${limit}&offset=${offset}`;
         // if(limit)
         //let pagination = serialize(this.state.pagination);
         //this.state.pagination.join()
@@ -55,7 +58,10 @@ export default class SearchApp extends React.Component {
         // use Redux!
         fetchJSON(this.src + 'search' + params).then(data => this.setState({
             loading: false,
-            data: data // @TODO backend should respond  limit, offset !
+            total: data.count,
+            limit: data.limit,
+            offset: data.offset,
+            data: data.rows
         }));
     }
 
@@ -66,12 +72,22 @@ export default class SearchApp extends React.Component {
             // dispatch action "SEARCH"
             return this.loadResults();
         };
+        let onPaginate = (limit, offset) => {
+            this.loadResults(limit, offset);
+        }
         return (
             <div>
                 <div className="well">
                     <SearchForm onSubmit={formSubmit} />
                 </div>
-                <SearchResult cols={this.state.cols} rows={this.state.data} />
+                <SearchResult
+                    onNext={onPaginate}
+                    onPrev={onPaginate}
+                    total={this.state.total}
+                    limit={this.state.limit}
+                    offset={this.state.offset}
+                    cols={this.state.cols}
+                    rows={this.state.data} />
             </div>
         );
     }

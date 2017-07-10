@@ -4,15 +4,10 @@ import Pagination from './Pagination.jsx';
 
 export default class SearchResult extends Component {
 
-    // @TODO i18n !
-    resultCount(count) {
-        return count > 0
-            ? count + ' resultados'
-            : '';
-    }
-
     render() {
         let {cols, rows} = this.props;
+        let {limit = 20, offset = 0, total, onNext, onPrev} = this.props;
+        let pagination = { onPrev, onNext, limit, offset, total, count: rows.length || 0 };
 
         let data_ths   = cols.map((col, i) => <th key={i} style={{ textTransform: 'capitalize' }}>{col}</th>);
         let action_ths = '';// actions.map((action,i) => <th key={i}>{action}</th>); ...in the future
@@ -26,11 +21,9 @@ export default class SearchResult extends Component {
         let data_rows = rows.length
             ? rows.map((row, i) => <SearchResultRow row={i} key={i} cols={row} displayCols={cols} />)
             : noResultsRow;
-        let resume = <div id="result-resume">{this.resultCount(rows.length)}</div>;
         return (
             <div>
-                {resume}
-                <Pagination />
+                <Pagination {...pagination} />
                 <table className="table table-stripped table-bordered table-hover">
                     <thead>{header_row}</thead>
                     <tbody>{data_rows}</tbody>
