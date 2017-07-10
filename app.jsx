@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 
 import fetchJSON from './Helpers/fetchJson.js';
 
-import SearchForm from 'SearchForm';
-import SearchResult from 'SearchResult';
-import Pagination from 'Pagination';
+import SearchForm from './SearchForm.jsx';
+import SearchResult from './SearchResult.jsx';
+// import Pagination from './Pagination.jsx';
 
 var $$ = document.querySelector.bind(document);
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
@@ -26,11 +26,10 @@ export default class SearchApp extends React.Component {
     }
 
     loadColumns() {
-        fetchJSON(this.src + '/columns/selected').then(cols => this.setState({cols}));
+        fetchJSON(this.src + 'columns/selected').then(cols => this.setState({cols}));
     }
 
-    loadResults({limit, offset}) {
-        evt.preventDefault();
+    loadResults() {
 
         let
             thisNode = ReactDOM.findDOMNode(this),
@@ -54,7 +53,7 @@ export default class SearchApp extends React.Component {
 
         // @TODO have previous "data" and append if paginating ...
         // use Redux!
-        fetchJSON(this.src + 'search?' + params).then(data => this.setState({
+        fetchJSON(this.src + 'search' + params).then(data => this.setState({
             loading: false,
             data: data // @TODO backend should respond  limit, offset !
         }));
@@ -65,19 +64,14 @@ export default class SearchApp extends React.Component {
         let formSubmit = (evt) => {
             evt.preventDefault();
             // dispatch action "SEARCH"
-            this.loadResults();
-        };
-        let Pagination = {
-            loadNextPage: () => {},
-            loadPrevPage: () => {},
-            setLimit: () => {}
+            return this.loadResults();
         };
         return (
             <div>
                 <div className="well">
                     <SearchForm onSubmit={formSubmit} />
                 </div>
-                <SearchResult cols={this.state.cols} rows={this.state.data} {...Pagination} />
+                <SearchResult cols={this.state.cols} rows={this.state.data} />
             </div>
         );
     }

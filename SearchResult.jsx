@@ -35,7 +35,6 @@ export default class SearchResult extends Component {
                     <thead>{header_row}</thead>
                     <tbody>{data_rows}</tbody>
                 </table>
-                <Pagination/>
             </div>
         );
     }

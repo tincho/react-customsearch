@@ -14,7 +14,7 @@ export default function SearchResultRow(props) {
     });
     let action_cols = null;
     // @TODO action columns :)
-    return <tr>{data_cols + action_cols}</tr>;
+    return <tr>{data_cols}</tr>;
 
     function trim(s) {
         return s;
