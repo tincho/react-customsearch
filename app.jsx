@@ -87,6 +87,7 @@ export default class SearchApp extends React.Component {
         }
         let onChangeOrder = (orderField, orderDirection) => {
             this.setState({
+                offset: 0, // always reset to first page
                 orderField, orderDirection
             }, this.loadResults);
         };

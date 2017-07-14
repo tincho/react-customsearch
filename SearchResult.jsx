@@ -16,10 +16,10 @@ function SortHeader(props) {
     onChangeOrder = props.onChangeOrder,
     onClick = evt => {
       evt.preventDefault();
-      if (field === colName) {
-        direction = invertDirection(direction.trim());
-      }
-      onChangeOrder(colName, direction);
+      let newDirection = (field === colName)
+         ? invertDirection(direction.trim())
+         : "ASC";
+      onChangeOrder(colName, newDirection);
     };
   return <a href="#" className={className} onClick={onClick}>{colName}</a>;
 };
