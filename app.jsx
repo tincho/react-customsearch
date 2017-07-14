@@ -20,7 +20,9 @@ export default class SearchApp extends React.Component {
             cols: [],
             total: 0,
             limit: 20,
-            offset: 0
+            offset: 0,
+            orderField: "",
+            orderDirection: ""
         };
     }
 
@@ -32,8 +34,7 @@ export default class SearchApp extends React.Component {
         fetchJSON(this.src + 'columns/selected').then(cols => this.setState({cols}));
     }
 
-    loadResults(limit = 20, offset = 0) {
-
+    loadResults() {
         let
             thisNode = ReactDOM.findDOMNode(this),
             $$       = thisNode.querySelector.bind(thisNode);
@@ -44,19 +45,24 @@ export default class SearchApp extends React.Component {
             value: 'any'
         }).value;
 
-        this.setState({
-            loading: true // @TODO ...SearchResult is loading its data!
-        });
+        // this.setState({ loading: true });
+        // COMMENTED because triggers render !
+        // @TODO ...SearchResult is loading its data!
 
-        let params = `?q=${q}&type=${type}&limit=${limit}&offset=${offset}`;
-        // if(limit)
-        //let pagination = serialize(this.state.pagination);
-        //this.state.pagination.join()
-        //if (this.state.paginaton.limit) params += '&limit=' +
+        const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
 
-        // @TODO have previous "data" and append if paginating ...
-        // use Redux!
-        fetchJSON(this.src + 'search' + params).then(data => this.setState({
+        let { limit, offset, orderField, orderDirection } = this.state;
+
+        let params = {
+            q, type, limit, offset
+        };
+        let order = orderField + " " + orderDirection;
+        if (order.replace(" ", "") !== "") {
+            params.order = order;
+        }
+        console.log(params);
+
+        fetchJSON(this.src + `search?${queryString(params)}`).then(data => this.setState({
             loading: false,
             total: data.count,
             limit: data.limit,
@@ -66,15 +72,24 @@ export default class SearchApp extends React.Component {
     }
 
     render() {
-        // @TODO handle pagination via REDUX
+        // @TODO implement REDUX pattern (and library)
         let formSubmit = (evt) => {
             evt.preventDefault();
-            // dispatch action "SEARCH"
-            return this.loadResults();
+            this.setState({
+                offset: 0,
+                orderField: "",
+                orderDirection: ""
+            }, this.loadResults)
         };
         let onPaginate = (limit, offset) => {
-            this.loadResults(limit, offset);
+            // @TODO there's no need for limit here, I think
+            this.setState({limit, offset}, this.loadResults);
         }
+        let onChangeOrder = (orderField, orderDirection) => {
+            this.setState({
+                orderField, orderDirection
+            }, this.loadResults);
+        };
         return (
             <div>
                 <div className="well">
@@ -83,9 +98,14 @@ export default class SearchApp extends React.Component {
                 <SearchResult
                     onNext={onPaginate}
                     onPrev={onPaginate}
-                    total={this.state.total}
+                    onChangeOrder={onChangeOrder}
+
                     limit={this.state.limit}
                     offset={this.state.offset}
+                    orderField={this.state.orderField}
+                    orderDirection={this.state.orderDirection}
+
+                    total={this.state.total}
                     cols={this.state.cols}
                     rows={this.state.data} />
             </div>
