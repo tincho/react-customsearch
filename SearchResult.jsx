@@ -44,8 +44,7 @@ export default function SearchResult(props) {
     offset = 0,
     total,
 
-    onNext,
-    onPrev,
+    onPaginate,
     onChangeOrder,
 
     orderField,
@@ -53,8 +52,7 @@ export default function SearchResult(props) {
   } = props;
 
   let pagination = {
-    onPrev,
-    onNext,
+    onPaginate,
     limit,
     offset,
     total,

@@ -81,9 +81,8 @@ export default class SearchApp extends React.Component {
                 orderDirection: ""
             }, this.loadResults)
         };
-        let onPaginate = (limit, offset) => {
-            // @TODO there's no need for limit here, I think
-            this.setState({limit, offset}, this.loadResults);
+        let onPaginate = (offset) => {
+            this.setState({offset}, this.loadResults);
         }
         let onChangeOrder = (orderField, orderDirection) => {
             this.setState({
@@ -97,8 +96,7 @@ export default class SearchApp extends React.Component {
                     <SearchForm onSubmit={formSubmit} />
                 </div>
                 <SearchResult
-                    onNext={onPaginate}
-                    onPrev={onPaginate}
+                    onPaginate={onPaginate}
                     onChangeOrder={onChangeOrder}
 
                     limit={this.state.limit}
