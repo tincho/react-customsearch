@@ -1,17 +1,17 @@
 import React from 'react';
 
-// @TODO get rid of Prev and Next, use only PaginationLink (figure out the prev and next page instead of prev and next offset) 
+// @TODO get rid of Prev and Next, use only PaginationLink (figure out the prev and next page instead of prev and next offset)
 
 function Prev({total, count,  offset = 0, onPaginate, limit}) {
     offset = parseInt(offset, 10);
     limit = parseInt(limit, 10);
-    let btn = <a className="btn disabled">&lsaquo;</a>;
+    let btn = <a className="disabled">&lsaquo;</a>;
     if (offset >= limit) {
         let onClick = (ev) => {
             ev.preventDefault();
             onPaginate(offset - limit);
         }
-        btn = <a className="btn" onClick={onClick}>&lsaquo;</a>;
+        btn = <a href="#" onClick={onClick}>&lsaquo;</a>;
     }
     return <li>{btn}</li>;
 }
@@ -19,13 +19,13 @@ function Prev({total, count,  offset = 0, onPaginate, limit}) {
 function Next({total, count, offset = 0, onPaginate, limit}) {
     offset = parseInt(offset, 10);
     limit = parseInt(limit, 10);
-    let btn = <a className="btn disabled">&rsaquo;</a>;
+    let btn = <a className="disabled">&rsaquo;</a>;
     if (total > count + offset) {
         let onClick = (ev) => {
             ev.preventDefault();
             onPaginate(offset + limit);
         }
-        btn = <a className="btn" onClick={onClick}>&rsaquo;</a>;
+        btn = <a href="#" onClick={onClick}>&rsaquo;</a>;
     }
     return <li>{btn}</li>;
 }
@@ -34,7 +34,7 @@ export default function Pagination({offset, count, total, limit, onPaginate})  {
     //let page = 1;
     offset = parseInt(offset, 10);
     let resume = count > 0
-        ? (offset + 1) + ' - ' + (offset + count) + ' / ' + total
+        ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
         : '';
 
     const pageOffset = (lim, p) => lim * Math.max(p - 1, 0);
@@ -42,8 +42,8 @@ export default function Pagination({offset, count, total, limit, onPaginate})  {
     const PaginationLink = ({page, text, onPaginate}) => {
         let newOffset = pageOffset(limit, page),
             isCurrent = !text && count > 0 && newOffset === offset;
-        return <li className={isCurrent ? 'active': ''}>
-            <a onClick={ () => onPaginate(newOffset) }>{text || page}</a>
+        return <li className={isCurrent && 'active'}>
+            <a onClick={ () => onPaginate(newOffset) } className={isCurrent && 'disabled'} href="#">{text || page}</a>
         </li>;
     }
 
@@ -66,7 +66,7 @@ export default function Pagination({offset, count, total, limit, onPaginate})  {
         : '';
 
     return <div>
-        {resume}<br />
-        {controls}
+        {controls}<br />
+        {resume}
     </div>;
 }
