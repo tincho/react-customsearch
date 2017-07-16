@@ -9,7 +9,7 @@ const invertDirection = d => get({
 }, d, "ASC");
 
 function SortHeader(props) {
-  let {field, direction, colName} = props,
+  let {field, direction, colName, text} = props,
     className = (field === colName)
       ? "orderField orderField--" + direction
       : "",
@@ -21,13 +21,13 @@ function SortHeader(props) {
          : "ASC";
       onChangeOrder(colName, newDirection);
     };
-  return <a href="#" className={className} onClick={onClick}>{colName}</a>;
+  return <a href="#" className={className} onClick={onClick}>{text}</a>;
 };
 
 function ColumnHeader(props) {
   let content = (props.resultsCount > 0)
-    ? <SortHeader {...props.order} colName={props.colName}/>
-    : props.colName;
+    ? <SortHeader {...props.order} text={props.text} colName={props.colName} />
+    : props.text;
   return (
     <th style={{ textTransform: 'capitalize' }}>
       {content}
@@ -37,6 +37,7 @@ function ColumnHeader(props) {
 
 export default function SearchResult(props) {
   let {
+    columnNames,
     cols,
     rows,
 
@@ -64,7 +65,7 @@ export default function SearchResult(props) {
     onChangeOrder
   };
 
-  let data_ths = cols.map((col, i) => <ColumnHeader key={i} colName={col} order={order} resultsCount={rows.length}/>);
+  let data_ths = cols.map((col, i) => <ColumnHeader key={i} colName={col} text={get(columnNames,col, col)} order={order} resultsCount={rows.length}/>);
 
   // @TODO let action_ths = actions.map((action,i) => <th key={i}>{action}</th>); then render after data_ths
 

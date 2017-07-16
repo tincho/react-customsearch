@@ -14,12 +14,14 @@ export default class SearchApp extends React.Component {
 
     constructor(props) {
         super(props);
-        this.src = props.src;
+        this.src = props.options.src;
+        this.columnNames = props.options.columnNames;
+
         this.state = {
             data: [],
             cols: [],
             total: 0,
-            limit: 20,
+            limit: props.options.limit || 20,
             offset: 0,
             orderField: "",
             orderDirection: ""
@@ -105,6 +107,7 @@ export default class SearchApp extends React.Component {
                     orderDirection={this.state.orderDirection}
 
                     total={this.state.total}
+                    columnNames={this.columnNames}
                     cols={this.state.cols}
                     rows={this.state.data} />
             </div>
