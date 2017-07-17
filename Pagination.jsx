@@ -10,7 +10,7 @@ const firstAndLastPage = ({currentPage, max, pages}) => {
     }
 
     if (pages - currentPage <= half ) {
-      firstPage =  pages - max - 1;
+      firstPage =  pages - max + 1;
     }
 
     lastPage  = Math.min(pages, firstPage + max - 1);
