@@ -1,9 +1,16 @@
 import React from 'react';
 
 const firstAndLastPage = ({currentPage, max, pages}) => {
-    let result = [];
-    //result = [1, pages];
-    return result;
+    let firstPage = 1,
+        lastPage = pages;
+
+    if ( currentPage > Math.floor(max / 2) ) {
+        firstPage = currentPage - Math.floor(max/2);
+    }
+
+    lastPage  = Math.min(pages, firstPage + max - 1);
+
+    return [firstPage, lastPage];
 };
 const getOffset = (lim, p) => lim * Math.max(p - 1, 0);
 const getPage = (lim, o) => 1 + Math.ceil(o / lim);
