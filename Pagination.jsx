@@ -2,14 +2,15 @@ import React from 'react';
 
 const firstAndLastPage = ({currentPage, max, pages}) => {
     let firstPage = 1,
-        lastPage = pages;
+        lastPage = pages,
+        half = Math.floor(max / 2);
 
-    if ( currentPage > Math.floor(max / 2) ) {
-        firstPage = currentPage - Math.floor(max/2);
+    if (currentPage > half) {
+        firstPage = currentPage - half;
     }
 
-    if ( currentPage - pages <= half ) {
-      firstPage = half + (currentPage - pages);
+    if (pages - currentPage <= half ) {
+      firstPage =  pages - max + 1;
     }
 
     lastPage  = Math.min(pages, firstPage + max - 1);
