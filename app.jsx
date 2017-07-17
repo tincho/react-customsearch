@@ -64,13 +64,17 @@ export default class SearchApp extends React.Component {
         }
         console.log(params);
 
-        fetchJSON(this.src + `search?${queryString(params)}`).then(data => this.setState({
+        fetchJSON(this.src + `search?${queryString(params)}`).then(data => {
+          this.setState({
             loading: false,
             total: data.count,
             limit: data.limit,
             offset: data.offset,
             data: data.rows
-        }));
+          }, () => {
+            history.pushState(params, "", queryString(params));
+          })
+        });
     }
 
     render() {
