@@ -28,12 +28,21 @@ export default class SearchApp extends React.Component {
         };
     }
 
+    triggerEvt(evt) {
+      console.log("Event: ");
+      console.log(evt);
+    }
+
     componentWillMount() {
         this.loadColumns();
     }
 
     loadColumns() {
-        fetchJSON(this.src + 'columns/selected').then(cols => this.setState({cols}));
+        this.triggerEvt("loading columns");
+        fetchJSON(this.src + 'columns/selected')
+          .then(cols => this.setState({cols}, () => {
+            this.triggerEvt("columns are set in state");
+          }));
     }
 
     loadResults() {
@@ -42,14 +51,14 @@ export default class SearchApp extends React.Component {
             $$       = thisNode.querySelector.bind(thisNode);
 
         // @TODO get these 2 values from SearchForm somehow
+        // @see https://facebook.github.io/react/docs/refs-and-the-dom.html
         var q = $$("input[name=q]").value;
+
+        // @FIXME if type changes and user clicks on Pagination link, Pagination will "break"
+        // because results may vary and offset would be wrong !!
         var type = ($$("input[name=type]:checked") || {
             value: 'any'
         }).value;
-
-        // this.setState({ loading: true });
-        // COMMENTED because triggers render !
-        // @TODO ...SearchResult is loading its data!
 
         const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
 
@@ -62,7 +71,8 @@ export default class SearchApp extends React.Component {
         if (order.replace(" ", "") !== "") {
             params.order = order;
         }
-        console.log(params);
+
+        this.triggerEvt("will load: " + queryString(params));
 
         fetchJSON(this.src + `search?${queryString(params)}`).then(data => {
           this.setState({
