@@ -78,12 +78,18 @@ export default function SearchResult(props) {
       </tr>
     );
 
+  let resume = (count > 0)
+    ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
+    : '';
+
   let data_rows = rows.length
     ? rows.map((row, i) => <SearchResultRow row={i} key={i} cols={row} displayCols={cols}/>)
     : noResultsRow;
+
   return (
     <div>
-      <Pagination {...pagination}/>
+      <Pagination {...pagination} />
+      {resume}
       <table className="table table-stripped table-bordered table-hover">
         <thead>
           <tr>{data_ths}</tr>

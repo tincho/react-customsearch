@@ -101,12 +101,13 @@ export default class SearchApp extends React.Component {
                     onPaginate={onPaginate}
                     onChangeOrder={onChangeOrder}
 
-                    limit={this.state.limit}
-                    offset={this.state.offset}
+                    total={parseInt(this.state.total, 10)}
+                    limit={parseInt(this.state.limit, 10)}
+                    offset={parseInt(this.state.offset, 10)}
+
                     orderField={this.state.orderField}
                     orderDirection={this.state.orderDirection}
 
-                    total={this.state.total}
                     columnNames={this.columnNames}
                     cols={this.state.cols}
                     rows={this.state.data} />
