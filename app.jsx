@@ -72,7 +72,7 @@ export default class SearchApp extends React.Component {
             offset: data.offset,
             data: data.rows
           }, () => {
-            history.pushState(params, "", queryString(params));
+            history.pushState(params, "", "?" + queryString(params));
           })
         });
     }
