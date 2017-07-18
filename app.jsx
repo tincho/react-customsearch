@@ -82,6 +82,7 @@ export default class SearchApp extends React.Component {
             offset: data.offset,
             data: data.rows
           }, () => {
+            this.triggerEvt("loaded results, total: ", data.count);
             history.pushState(params, "", "?" + queryString(params));
           })
         });
