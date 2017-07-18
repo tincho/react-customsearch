@@ -1,22 +1,19 @@
-import React, {Component} from 'react';
+import React from 'react';
 
-// another way to define React component
+const identity = v => () => v;
+const get = (needle, haystack, spoon) => haystack[needle] || spoon;
+
 export default function SearchResultRow(props) {
-
-    let {cols, rowId, displayCols} = props;
-    let data_cols = Object.keys(cols).map((columnName) => {
-        let showColumn = displayCols.length
-            ? displayCols.indexOf(columnName) !== -1
-            : true;
-        return showColumn
-            ? <td key={rowId + "-" + columnName}>{trim(cols[columnName])}</td>
-            : null;
-    });
-    let action_cols = null;
-    // @TODO action columns :)
+    let
+      {cols, rowId, displayCols, fieldFormatters} = props,
+      let showColumn = displayCols.length
+        ? columnName => displayCols.indexOf(columnName) !== 1
+        : () => true,
+      Field = columnName => {
+          let formatter = get(fieldFormatters, columnName, identity),
+              value = formatter(get(cols, columnName));
+          return <td key={rowId + "-" + columnName}>{value}</td>;
+      },
+      data_cols = Object.keys(cols).filter(showColumn).map(Field);
     return <tr>{data_cols}</tr>;
-
-    function trim(s) {
-        return s;
-    }
 }

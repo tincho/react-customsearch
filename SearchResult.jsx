@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import SearchResultRow from './SearchResultRow.jsx';
 import Pagination from './Pagination.jsx';
 
