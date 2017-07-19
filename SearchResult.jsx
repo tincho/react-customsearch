@@ -1,5 +1,4 @@
 import React from 'react';
-import SearchResultRow from './SearchResultRow.jsx';
 import Pagination from './Pagination.jsx';
 
 const identity = v => v;
@@ -43,10 +42,10 @@ function ResultRow(props) {
         ? columnName => displayCols.indexOf(columnName) !== -1
         : () => true,
       getValue     = columnName => get(cols, columnName),
-      getFormatter = columnName => get(fieldFormatters, columName, identity),
+      getFormatter = columnName => get(fieldFormatters, columnName, identity),
       formatValue  = columnName => {
-        let f = getFormatter(columName);
-        return f(getValue(columName))
+        let f = getFormatter(columnName);
+        return f(getValue(columnName))
       },
       data_cols = Object.keys(cols).filter(showColumn)
         .map(columnName => <td key={rowId + "-" + columnName}>{formatValue(columnName)}</td>);
