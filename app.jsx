@@ -1,15 +1,13 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 
 import fetchJSON from './Helpers/fetchJson.js';
 
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
-
-var $$ = document.querySelector.bind(document);
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
+const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
 
-export default class SearchApp extends React.Component {
+export default class SearchApp extends Component {
 
     constructor(props) {
         super(props);
@@ -48,44 +46,24 @@ export default class SearchApp extends React.Component {
 
     loadResults() {
         let
-            thisNode = ReactDOM.findDOMNode(this),
-            $$       = thisNode.querySelector.bind(thisNode);
+          { q, type } = this.form,
+          q = q.value,
+          type = get(Array.from(type).find(i => i.checked), 'value', 'any'),
 
-        {
-          let { q, type } = this.form,
-          qValue = q.value,
-          typeValue = get(Array.from(typeInput).find(i => i.checked), 'value', 'any');
-        }
+          { limit, offset, orderField, orderDirection } = this.state,
+          order = orderField + " " + orderDirection,
+          previousType = this.state.type,
+          params = { q, type, limit, offset: (type === previousType) ? offset : 0 };
 
-        var q = $$("input[name=q]").value;
-
-        // @FIXME if type changes and user clicks on Pagination link, Pagination will "break"
-        // because results may vary and offset would be wrong !!
-        // SOLUTION:
-        var type = ($$("input[name=type]:checked") || {
-            value: 'any'
-        }).value;
-
-        const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
-
-        let { limit, offset, orderField, orderDirection } = this.state;
-
-        let params = {
-            q, type, limit, offset
-        };
-
-        // add order:
-        let order = orderField + " " + orderDirection;
+        // conditionally add order:
         if (order.replace(" ", "") !== "") {
             params.order = order;
         }
 
-        // fix offset:
-        // if "type" !== "last type" params.offset = 0
-
         this.triggerEvt("will load: " + queryString(params));
 
         fetchJSON(this.src + `search?${queryString(params)}`).then(data => this.setState({
+            q, type,
             loading: false,
             total: data.count,
             limit: data.limit,
