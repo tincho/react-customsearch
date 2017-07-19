@@ -5,7 +5,6 @@ import fetchJSON from './Helpers/fetchJson.js';
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
-const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
 
 export default class SearchApp extends Component {
 
@@ -20,7 +19,7 @@ export default class SearchApp extends Component {
             data: [],
             cols: [],
             total: 0,
-            limit: props.options.limit || 20,
+            limit: parseInt(props.options.limit, 10) || 20,
             offset: 0,
             orderField: "",
             orderDirection: ""
@@ -45,11 +44,15 @@ export default class SearchApp extends Component {
     }
 
     loadResults() {
-        let
-          { q, type } = this.form,
-          q = q.value,
-          type = get(Array.from(type).find(i => i.checked), 'value', 'any'),
+        const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
+        const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 
+        let
+          { q, type } = this.form;
+        q = q.value;
+        type = get(Array.from(type).find(i => i.checked), 'value', 'any');
+
+        let
           { limit, offset, orderField, orderDirection } = this.state,
           order = orderField + " " + orderDirection,
           previousType = this.state.type,
@@ -66,8 +69,8 @@ export default class SearchApp extends Component {
             q, type,
             loading: false,
             total: data.count,
-            limit: data.limit,
-            offset: data.offset,
+            //limit: data.limit,
+            offset: params.offset,
             data: data.rows
         }));
     }
