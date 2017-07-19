@@ -5,7 +5,6 @@ import fetchJSON from './Helpers/fetchJson.js';
 
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
-// import Pagination from './Pagination.jsx';
 
 var $$ = document.querySelector.bind(document);
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
@@ -14,6 +13,7 @@ export default class SearchApp extends React.Component {
 
     constructor(props) {
         super(props);
+        this.form = {};
         this.src = props.options.src;
         this.columnNames = props.options.columnNames;
         this.fieldFormatters = props.options.fieldFormatters;
@@ -51,12 +51,17 @@ export default class SearchApp extends React.Component {
             thisNode = ReactDOM.findDOMNode(this),
             $$       = thisNode.querySelector.bind(thisNode);
 
-        // @TODO get these 2 values from SearchForm somehow
-        // @see https://facebook.github.io/react/docs/refs-and-the-dom.html
+        {
+          let { q, type } = this.form,
+          qValue = q.value,
+          typeValue = get(Array.from(typeInput).find(i => i.checked), 'value', 'any');
+        }
+
         var q = $$("input[name=q]").value;
 
         // @FIXME if type changes and user clicks on Pagination link, Pagination will "break"
         // because results may vary and offset would be wrong !!
+        // SOLUTION:
         var type = ($$("input[name=type]:checked") || {
             value: 'any'
         }).value;
@@ -68,10 +73,15 @@ export default class SearchApp extends React.Component {
         let params = {
             q, type, limit, offset
         };
+
+        // add order:
         let order = orderField + " " + orderDirection;
         if (order.replace(" ", "") !== "") {
             params.order = order;
         }
+
+        // fix offset:
+        // if "type" !== "last type" params.offset = 0
 
         this.triggerEvt("will load: " + queryString(params));
 
@@ -111,7 +121,7 @@ export default class SearchApp extends React.Component {
         return (
             <div>
                 <div className="well">
-                    <SearchForm onSubmit={formSubmit} />
+                    <SearchForm onSubmit={formSubmit} formRef={(form) => { this.form = form }} />
                 </div>
                 <SearchResult
                     onPaginate={onPaginate}
