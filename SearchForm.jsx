@@ -19,8 +19,9 @@ export default class SearchForm extends Component {
         };
         let searchLabel = 'Buscar';
         let typeIs = t => this.state.matchType === t;
+
         return (
-            <form onSubmit={this.props.onSubmit}>
+            <form onSubmit={this.props.onSubmit} ref={this.props.formRef}>
                 <div className="form-group">
                     <label htmlFor="search-query">{searchQueryLabel}</label>
                     <input id="search-query" name="q" className="form-control" placeholder={searchQueryPlaceholder} />
