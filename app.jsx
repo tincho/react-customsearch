@@ -16,6 +16,7 @@ export default class SearchApp extends React.Component {
         super(props);
         this.src = props.options.src;
         this.columnNames = props.options.columnNames;
+        this.fieldFormatters = props.options.fieldFormatters;
 
         this.state = {
             data: [],
@@ -82,7 +83,7 @@ export default class SearchApp extends React.Component {
             offset: data.offset,
             data: data.rows
           }, () => {
-            this.triggerEvt("loaded results, total: ", data.count);
+            this.triggerEvt("loaded results, total: " + data.count);
             history.pushState(params, "", "?" + queryString(params));
           })
         });
@@ -115,13 +116,15 @@ export default class SearchApp extends React.Component {
                 <SearchResult
                     onPaginate={onPaginate}
                     onChangeOrder={onChangeOrder}
+                    fieldFormatters={this.fieldFormatters}
 
-                    limit={this.state.limit}
-                    offset={this.state.offset}
+                    total={parseInt(this.state.total, 10)}
+                    limit={parseInt(this.state.limit, 10)}
+                    offset={parseInt(this.state.offset, 10)}
+
                     orderField={this.state.orderField}
                     orderDirection={this.state.orderDirection}
 
-                    total={this.state.total}
                     columnNames={this.columnNames}
                     cols={this.state.cols}
                     rows={this.state.data} />
