@@ -47,6 +47,7 @@ export default function SearchResult(props) {
 
     onPaginate,
     onChangeOrder,
+    fieldFormatters,
 
     orderField,
     orderDirection
@@ -78,12 +79,14 @@ export default function SearchResult(props) {
       </tr>
     );
 
-  let resume = (count > 0)
+  let
+    count = rows.length,
+    resume = (count > 0)
     ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
     : '';
 
-  let data_rows = rows.length
-    ? rows.map((row, i) => <SearchResultRow row={i} key={i} cols={row} displayCols={cols}/>)
+  let data_rows = count
+    ? rows.map((row, i) => <SearchResultRow row={i} key={i} cols={row} displayCols={cols} fieldFormatters={fieldFormatters} />)
     : noResultsRow;
 
   return (
@@ -96,6 +99,7 @@ export default function SearchResult(props) {
         </thead>
         <tbody>{data_rows}</tbody>
       </table>
+      <Pagination {...pagination} />
     </div>
   );
 }

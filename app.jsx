@@ -16,6 +16,7 @@ export default class SearchApp extends React.Component {
         super(props);
         this.src = props.options.src;
         this.columnNames = props.options.columnNames;
+        this.fieldFormatters = props.options.fieldFormatters;
 
         this.state = {
             data: [],
@@ -110,6 +111,7 @@ export default class SearchApp extends React.Component {
                 <SearchResult
                     onPaginate={onPaginate}
                     onChangeOrder={onChangeOrder}
+                    fieldFormatters={this.fieldFormatters}
 
                     total={parseInt(this.state.total, 10)}
                     limit={parseInt(this.state.limit, 10)}

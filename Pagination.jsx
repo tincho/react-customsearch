@@ -20,7 +20,7 @@ function PageLink(limit, currentOffset, {page, text, onClick, disabled}) {
 }
 
 function PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate}) {
-  let pageButtons = [], hellip = <li className="disabled"><a>&hellip;</a></li>;
+  let pageButtons = [], hellip = <li key={+new Date()} className="disabled"><a>&hellip;</a></li>;
   for (let page = firstPage; page <= lastPage; page++) {
       let moreBefore = (page > 1),
           moreAfter  = (pages > lastPage);
@@ -43,7 +43,7 @@ export default function Pagination(props) {
         pages = Math.floor(total / limit) + 1;
 
     if (pages <= 1) {
-      return;
+      return null;
     }
 
     let

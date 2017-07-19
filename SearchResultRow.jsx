@@ -1,13 +1,13 @@
 import React from 'react';
 
-const identity = v => () => v;
-const get = (needle, haystack, spoon) => haystack[needle] || spoon;
+const identity = v => v;
+const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 
 export default function SearchResultRow(props) {
     let
       {cols, rowId, displayCols, fieldFormatters} = props,
-      let showColumn = displayCols.length
-        ? columnName => displayCols.indexOf(columnName) !== 1
+      showColumn = displayCols.length
+        ? columnName => displayCols.indexOf(columnName) !== -1
         : () => true,
       Field = columnName => {
           let formatter = get(fieldFormatters, columnName, identity),
