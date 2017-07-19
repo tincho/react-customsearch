@@ -2,6 +2,7 @@ import React from 'react';
 import SearchResultRow from './SearchResultRow.jsx';
 import Pagination from './Pagination.jsx';
 
+const identity = v => v;
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 const invertDirection = d => get({
   ASC: "DESC",
@@ -33,6 +34,23 @@ function ColumnHeader(props) {
       {content}
     </th>
   );
+}
+
+function ResultRow(props) {
+    let
+      {cols, rowId, displayCols, fieldFormatters} = props,
+      showColumn = displayCols.length
+        ? columnName => displayCols.indexOf(columnName) !== -1
+        : () => true,
+      getValue     = columnName => get(cols, columnName),
+      getFormatter = columnName => get(fieldFormatters, columName, identity),
+      formatValue  = columnName => {
+        let f = getFormatter(columName);
+        return f(getValue(columName))
+      },
+      data_cols = Object.keys(cols).filter(showColumn)
+        .map(columnName => <td key={rowId + "-" + columnName}>{formatValue(columnName)}</td>);
+    return <tr>{data_cols}</tr>;
 }
 
 export default function SearchResult(props) {
@@ -82,12 +100,11 @@ export default function SearchResult(props) {
   let
     count = rows.length,
     resume = (count > 0)
-    ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
-    : '';
-
-  let data_rows = count
-    ? rows.map((row, i) => <SearchResultRow row={i} key={i} cols={row} displayCols={cols} fieldFormatters={fieldFormatters} />)
-    : noResultsRow;
+      ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
+      : '',
+    data_rows = count
+      ? rows.map((row, i) => <ResultRow row={i} key={i} cols={row} displayCols={cols} fieldFormatters={fieldFormatters} />)
+      : noResultsRow;
 
   return (
     <div>
