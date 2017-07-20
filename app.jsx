@@ -76,7 +76,7 @@ export default class SearchApp extends Component {
             this.triggerEvt("loaded results, total: " + data.count);
             history.pushState(params, "", "?" + queryString(params));
           })
-        });
+        );
     }
 
     render() {
