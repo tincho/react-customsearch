@@ -25,6 +25,7 @@ export default class SearchApp extends Component {
         this.state = {
             data: [],
             cols: [],
+            type: "any",
             total: 0,
             limit: parseInt(props.options.limit, 10) || 20,
             offset: 0,
@@ -66,7 +67,7 @@ export default class SearchApp extends Component {
         this.form.q.value = q;
         this.form.type.value = type;
 
-        this.loadResults({ offset, limit: this.state.limit });
+        this.loadResults({ offset });
     }
 
     loadColumns() {
@@ -88,7 +89,7 @@ export default class SearchApp extends Component {
         });
     }
 
-    loadResults({ offset, limit = 20 }, afterSearch = noop) {
+    loadResults({ offset }, afterSearch = noop) {
         if (typeof offset === 'undefined') {
             offset = this.state.offset;
         }
@@ -101,11 +102,10 @@ export default class SearchApp extends Component {
         let
           { orderField, orderDirection } = this.state,
           order = orderField + " " + orderDirection,
-          previousType = this.state.type,
           params = {
               q, type,
               // limit,
-              offset: (type === previousType) ? offset : 0
+              offset
           };
 
         // conditionally add order:
@@ -140,6 +140,7 @@ export default class SearchApp extends Component {
             }, this.search)
         };
         let onPaginate = (offset) => {
+            offset = this.form.type.value === this.state.type ? offset : 0;
             this.setState({offset}, this.search);
         }
         let onChangeOrder = (orderField, orderDirection) => {
