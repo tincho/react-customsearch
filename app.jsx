@@ -12,7 +12,7 @@ const history = createHistory();
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 const noop = () => {};
 
-export default class SearchApp extends Component {
+export default class CustomSearch extends Component {
 
     constructor(props) {
         super(props);
