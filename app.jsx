@@ -12,8 +12,6 @@ const history = createHistory();
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 const noop = () => {};
 
-// var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
-
 export default class SearchApp extends Component {
 
     constructor(props) {
@@ -107,7 +105,7 @@ export default class SearchApp extends Component {
           params = {
               q, type,
               // limit,
-              offset : (type === previousType) ? offset : 0 // @TODO re-fix this !
+              offset: (type === previousType) ? offset : 0
           };
 
         // conditionally add order:

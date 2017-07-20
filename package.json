@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "query-string": "*",
+    "history": "*"
   },
   "devDependencies": {
     "babel-core": "^6.4.5",
