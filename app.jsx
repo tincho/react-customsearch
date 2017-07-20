@@ -63,7 +63,7 @@ export default class SearchApp extends Component {
         }
         let args = querystring.parse(location.search);
         let { q, type, page } = args,
-            offset = ~~getOffset(this.state.limit, page);
+            offset = getOffset(this.state.limit, page);
 
         this.form.q.value = q;
         this.form.type.value = type;
