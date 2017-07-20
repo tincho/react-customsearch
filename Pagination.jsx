@@ -8,8 +8,8 @@ const firstAndLastPage = ({current, side, pages}) => {
     return [ first, last ];
 }
 
-const getOffset = (lim, p) => lim * Math.max(p - 1, 0);
-const getPage = (lim, o) => 1 + Math.ceil(o / lim);
+export const getOffset = (lim, p) => lim * Math.max(p - 1, 0);
+export const getPage = (lim, o) => 1 + Math.ceil(o / lim);
 
 function PageLink(limit, currentOffset, {page, text, onClick, disabled}) {
   let newOffset = getOffset(limit, page),

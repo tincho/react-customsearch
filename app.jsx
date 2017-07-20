@@ -4,6 +4,14 @@ import fetchJSON from './Helpers/fetchJson.js';
 
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
+import { getOffset, getPage } from './Pagination.jsx';
+
+import querystring from 'query-string';
+import createHistory from 'history/createBrowserHistory'
+const history = createHistory();
+const get = (haystack, needle, spoon) => haystack[needle] || spoon;
+const noop = () => {};
+
 // var serialize = obj => Object.keys(obj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`).join('&');
 
 export default class SearchApp extends Component {
@@ -14,6 +22,7 @@ export default class SearchApp extends Component {
         this.src = props.options.src;
         this.columnNames = props.options.columnNames;
         this.fieldFormatters = props.options.fieldFormatters;
+        this.routerOff = () => {};
 
         this.state = {
             data: [],
@@ -33,6 +42,33 @@ export default class SearchApp extends Component {
 
     componentWillMount() {
         this.loadColumns();
+        // this.listenHistory();
+    }
+
+    listenHistory() {
+        this.routerOff = history.listen(location => this.loadRoute(location));
+    }
+
+    componentDidMount() {
+        this.loadRoute(history.location);
+    }
+
+    componentWillUnmount() {
+        this.routerOff();
+    }
+
+    loadRoute(location) {
+        if (location.search === "") {
+            return;
+        }
+        let args = querystring.parse(location.search);
+        let { q, type, page } = args,
+            offset = ~~getOffset(this.state.limit, page);
+
+        this.form.q.value = q;
+        this.form.type.value = type;
+
+        this.loadResults({ offset, limit: this.state.limit });
     }
 
     loadColumns() {
@@ -43,9 +79,21 @@ export default class SearchApp extends Component {
           }));
     }
 
-    loadResults() {
-        const queryString = params => Object.keys(params).reduce((str, key) => str + `${key}=${params[key]}&`, "").replace(/\&$/, '');
-        const get = (haystack, needle, spoon) => haystack[needle] || spoon;
+    search() {
+        this.loadResults({}, params => {
+            let args = Object.assign({}, params);
+            delete args.offset;
+            args.page = getPage(this.state.limit, params.offset);
+            // this.routerOff();
+            history.push('?' + querystring.stringify(args), args);
+            // this.listenHistory();
+        });
+    }
+
+    loadResults({ offset, limit = 20 }, afterSearch = noop) {
+        if (typeof offset === 'undefined') {
+            offset = this.state.offset;
+        }
 
         let
           { q, type } = this.form;
@@ -53,19 +101,23 @@ export default class SearchApp extends Component {
         type = get(Array.from(type).find(i => i.checked), 'value', 'any');
 
         let
-          { limit, offset, orderField, orderDirection } = this.state,
+          { orderField, orderDirection } = this.state,
           order = orderField + " " + orderDirection,
           previousType = this.state.type,
-          params = { q, type, limit, offset: (type === previousType) ? offset : 0 };
+          params = {
+              q, type,
+              // limit,
+              offset : (type === previousType) ? offset : 0 // @TODO re-fix this !
+          };
 
         // conditionally add order:
         if (order.replace(" ", "") !== "") {
             params.order = order;
         }
 
-        this.triggerEvt("will load: " + queryString(params));
-
-        fetchJSON(this.src + `search?${queryString(params)}`).then(data => this.setState({
+        let search = querystring.stringify(params);
+        this.triggerEvt("will load: " + search);
+        fetchJSON(this.src + `search?${search}`).then(data => this.setState({
             q, type,
             loading: false,
             total: data.count,
@@ -74,7 +126,7 @@ export default class SearchApp extends Component {
             data: data.rows
           }, () => {
             this.triggerEvt("loaded results, total: " + data.count);
-            history.pushState(params, "", "?" + queryString(params));
+            afterSearch(params);
           })
         );
     }
@@ -87,16 +139,16 @@ export default class SearchApp extends Component {
                 offset: 0,
                 orderField: "",
                 orderDirection: ""
-            }, this.loadResults)
+            }, this.search)
         };
         let onPaginate = (offset) => {
-            this.setState({offset}, this.loadResults);
+            this.setState({offset}, this.search);
         }
         let onChangeOrder = (orderField, orderDirection) => {
             this.setState({
                 offset: 0, // always reset to first page
                 orderField, orderDirection
-            }, this.loadResults);
+            }, this.search);
         };
         return (
             <div>
