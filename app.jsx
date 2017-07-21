@@ -12,6 +12,12 @@ const history = createHistory();
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 const noop = () => {};
 
+const pushLocation = args => {
+    // this.routerOff();
+    history.push('?' + querystring.stringify(args), args);
+    // this.listenHistory();
+}
+
 export default class CustomSearch extends Component {
 
     constructor(props) {
@@ -87,14 +93,7 @@ export default class CustomSearch extends Component {
     }
 
     search() {
-        this.loadResults({}, params => {
-            let args = Object.assign({}, params);
-            delete args.offset;
-            args.page = getPage(this.state.limit, params.offset);
-            // this.routerOff();
-            history.push('?' + querystring.stringify(args), args);
-            // this.listenHistory();
-        });
+        this.loadResults({}, pushLocation);
     }
 
     loadResults({ offset, order }, afterSearch = noop) {
@@ -122,40 +121,47 @@ export default class CustomSearch extends Component {
 
         let search = querystring.stringify(params);
         this.triggerEvt("will load: " + search);
-        fetchJSON(this.src + `search?${search}`).then(data => this.setState({
-            q, type,
-            loading: false,
-            total: data.count,
-            //limit: data.limit,
-            offset: params.offset,
-            data: data.rows,
-            orderField, orderDirection
-          }, () => {
-            this.triggerEvt("loaded results, total: " + data.count);
-            afterSearch(params);
-          })
+        return new Promise((resolve, reject) => {
+            fetchJSON(this.src + `search?${search}`).then(data => this.setState({
+                q, type,
+                loading: false,
+                total: data.count,
+                //limit: data.limit,
+                offset: params.offset,
+                data: data.rows,
+                orderField, orderDirection
+            }, () => {
+                this.triggerEvt("loaded results, total: " + data.count);
+                let args = Object.assign({}, params);
+                delete args.offset;
+                args.page = getPage(this.state.limit, params.offset);
+                resolve(args);
+                // @TODO handle reject !
+            })
         );
+        });
     }
 
     render() {
         // @TODO implement REDUX pattern (and library)
         let formSubmit = (evt) => {
             evt.preventDefault();
-            this.setState({
-                offset: 0,
-                orderField: "",
-                orderDirection: ""
-            }, this.search)
+            let offset = 0,
+                orderField = "",
+                orderDirection = "";
+            this.loadResults({
+                offset,
+                order: { orderField, orderDirection }
+            }).then(pushLocation);
         };
         let onPaginate = (offset) => {
             offset = this.form.type.value === this.state.type ? offset : 0;
-            this.setState({offset}, this.search);
+            this.loadResults({ offset }).then(pushLocation);
         }
         let onChangeOrder = (orderField, orderDirection) => {
-            this.setState({
-                offset: 0, // always reset to first page
-                orderField, orderDirection
-            }, this.search);
+            let offset = 0,
+                order = { orderField, orderDirection };
+            this.loadResults({ offset, order }).then(pushLocation);
         };
         return (
             <div>
