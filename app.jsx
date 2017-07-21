@@ -10,12 +10,9 @@ import querystring from 'query-string';
 import createHistory from 'history/createBrowserHistory'
 const history = createHistory();
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
-const noop = () => {};
 
 const pushLocation = args => {
-    // this.routerOff();
     history.push('?' + querystring.stringify(args), args);
-    // this.listenHistory();
 }
 
 export default class CustomSearch extends Component {
@@ -26,7 +23,6 @@ export default class CustomSearch extends Component {
         this.src = props.options.src;
         this.columnNames = props.options.columnNames;
         this.fieldFormatters = props.options.fieldFormatters;
-        this.routerOff = () => {};
 
         this.state = {
             data: [],
@@ -40,59 +36,43 @@ export default class CustomSearch extends Component {
         };
     }
 
-    triggerEvt(evt) {
-      console.log("Event: ");
-      console.log(evt);
-    }
-
     componentWillMount() {
         this.loadColumns();
-        // this.listenHistory();
-    }
-
-    listenHistory() {
-        this.routerOff = history.listen(location => this.loadRoute(location));
     }
 
     componentDidMount() {
         this.loadRoute(history.location);
     }
 
-    componentWillUnmount() {
-        this.routerOff();
-    }
-
-    loadRoute(location) {
-        if (location.search === "") {
+    loadRoute({ search }) {
+        if (search === "") {
             return;
         }
-        let args = querystring.parse(location.search);
-        let { q, type, page, order = '' } = args,
+        let args = querystring.parse(search),
+            { q, type, page, order = "" } = args,
             offset = getOffset(this.state.limit, page);
 
+        // set url params to DOM elements
         this.form.q.value = q;
         this.form.type.value = type;
 
-        let parseOrder = order.match(/(\w+)\s+(ASC|DESC)/) || "  ";
+        let [ , // [0] is ignored
+            orderField = "",
+            orderDirection = ""
+        ] = order.match(/(\w+)\s+(ASC|DESC)/) || "  ";
 
         this.loadResults({
             offset,
-            order: {
-                orderField: parseOrder[1] || "",
-                orderDirection: parseOrder[2] || ""
-            }
+            order: { orderField, orderDirection }
         });
     }
 
     loadColumns() {
-        this.triggerEvt("loading columns");
         fetchJSON(this.src + 'columns/selected')
-          .then(cols => this.setState({cols}, () => {
-            this.triggerEvt("columns are set in state");
-          }));
+          .then(cols => this.setState({cols}));
     }
 
-    loadResults({ offset, order }, afterSearch = noop) {
+    loadResults({ offset, order }) {
         if (typeof offset === 'undefined') {
             offset = this.state.offset;
         }
@@ -104,7 +84,6 @@ export default class CustomSearch extends Component {
         let
           params = {
               q, type,
-              // limit,
               offset
           },
           { orderField, orderDirection } = order || this.state;
@@ -116,7 +95,6 @@ export default class CustomSearch extends Component {
         }
 
         let search = querystring.stringify(params);
-        this.triggerEvt("will load: " + search);
         return new Promise((resolve, reject) => {
             fetchJSON(this.src + `search?${search}`).then(data => {
                 this.setState({
@@ -128,7 +106,6 @@ export default class CustomSearch extends Component {
                     data: data.rows,
                     orderField, orderDirection
                 }, () => {
-                    this.triggerEvt("loaded results, total: " + data.count);
                     let args = Object.assign({}, params);
                     delete args.offset;
                     args.page = getPage(this.state.limit, params.offset);
@@ -153,8 +130,10 @@ export default class CustomSearch extends Component {
             this.loadResults({ offset }).then(pushLocation);
         }
         let onChangeOrder = (orderField, orderDirection) => {
-            let order = { orderField, orderDirection };
-            this.loadResults({ offset: 0, order }).then(pushLocation);
+            this.loadResults({
+                offset: 0,
+                order: { orderField, orderDirection }
+            }).then(pushLocation);
         };
         return (
             <div>
