@@ -61,13 +61,13 @@ export default class CustomSearch extends Component {
             return;
         }
         let args = querystring.parse(location.search);
-        let { q, type, page, order } = args,
+        let { q, type, page, order = '' } = args,
             offset = getOffset(this.state.limit, page);
 
         this.form.q.value = q;
         this.form.type.value = type;
 
-        let parseOrder = order.match(/(\w+)\s+(ASC|DESC)/);
+        let parseOrder = order.match(/(\w+)\s+(ASC|DESC)/) || "  ";
 
         this.loadResults({
             offset,
@@ -116,7 +116,7 @@ export default class CustomSearch extends Component {
 
         // conditionally add order:
         let orderStr = orderField + " " + orderDirection;
-        if (orderStr.replace(" ", "") !== "") {
+        if (orderStr.replace(/\s/g, "") !== "") {
             params.order = orderStr;
         }
 
