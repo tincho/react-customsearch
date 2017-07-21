@@ -92,10 +92,6 @@ export default class CustomSearch extends Component {
           }));
     }
 
-    search() {
-        this.loadResults({}, pushLocation);
-    }
-
     loadResults({ offset, order }, afterSearch = noop) {
         if (typeof offset === 'undefined') {
             offset = this.state.offset;
@@ -122,23 +118,24 @@ export default class CustomSearch extends Component {
         let search = querystring.stringify(params);
         this.triggerEvt("will load: " + search);
         return new Promise((resolve, reject) => {
-            fetchJSON(this.src + `search?${search}`).then(data => this.setState({
-                q, type,
-                loading: false,
-                total: data.count,
-                //limit: data.limit,
-                offset: params.offset,
-                data: data.rows,
-                orderField, orderDirection
-            }, () => {
-                this.triggerEvt("loaded results, total: " + data.count);
-                let args = Object.assign({}, params);
-                delete args.offset;
-                args.page = getPage(this.state.limit, params.offset);
-                resolve(args);
-                // @TODO handle reject !
-            })
-        );
+            fetchJSON(this.src + `search?${search}`).then(data => {
+                this.setState({
+                    q, type,
+                    loading: false,
+                    total: data.count,
+                    //limit: data.limit,
+                    offset: params.offset,
+                    data: data.rows,
+                    orderField, orderDirection
+                }, () => {
+                    this.triggerEvt("loaded results, total: " + data.count);
+                    let args = Object.assign({}, params);
+                    delete args.offset;
+                    args.page = getPage(this.state.limit, params.offset);
+                    resolve(args);
+                    // @TODO handle reject !
+                })
+            );
         });
     }
 
@@ -146,12 +143,9 @@ export default class CustomSearch extends Component {
         // @TODO implement REDUX pattern (and library)
         let formSubmit = (evt) => {
             evt.preventDefault();
-            let offset = 0,
-                orderField = "",
-                orderDirection = "";
             this.loadResults({
-                offset,
-                order: { orderField, orderDirection }
+                offset: 0,
+                order: { orderField: "", orderDirection: "" }
             }).then(pushLocation);
         };
         let onPaginate = (offset) => {
@@ -159,9 +153,8 @@ export default class CustomSearch extends Component {
             this.loadResults({ offset }).then(pushLocation);
         }
         let onChangeOrder = (orderField, orderDirection) => {
-            let offset = 0,
-                order = { orderField, orderDirection };
-            this.loadResults({ offset, order }).then(pushLocation);
+            let order = { orderField, orderDirection };
+            this.loadResults({ offset: 0, order }).then(pushLocation);
         };
         return (
             <div>
