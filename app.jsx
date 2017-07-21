@@ -61,13 +61,21 @@ export default class CustomSearch extends Component {
             return;
         }
         let args = querystring.parse(location.search);
-        let { q, type, page } = args,
+        let { q, type, page, order } = args,
             offset = getOffset(this.state.limit, page);
 
         this.form.q.value = q;
         this.form.type.value = type;
 
-        this.loadResults({ offset });
+        let parseOrder = order.match(/(\w+)\s+(ASC|DESC)/);
+
+        this.loadResults({
+            offset,
+            order: {
+                orderField: parseOrder[1] || "",
+                orderDirection: parseOrder[2] || ""
+            }
+        });
     }
 
     loadColumns() {
@@ -89,28 +97,27 @@ export default class CustomSearch extends Component {
         });
     }
 
-    loadResults({ offset }, afterSearch = noop) {
+    loadResults({ offset, order }, afterSearch = noop) {
         if (typeof offset === 'undefined') {
             offset = this.state.offset;
         }
 
-        let
-          { q, type } = this.form;
+        let { q, type } = this.form;
         q = q.value;
-        type = get(Array.from(type).find(i => i.checked), 'value', 'any');
+        type = Array.from(type).find(i => i.checked).value || 'any';
 
         let
-          { orderField, orderDirection } = this.state,
-          order = orderField + " " + orderDirection,
           params = {
               q, type,
               // limit,
               offset
-          };
+          },
+          { orderField, orderDirection } = order || this.state;
 
         // conditionally add order:
-        if (order.replace(" ", "") !== "") {
-            params.order = order;
+        let orderStr = orderField + " " + orderDirection;
+        if (orderStr.replace(" ", "") !== "") {
+            params.order = orderStr;
         }
 
         let search = querystring.stringify(params);
@@ -121,7 +128,8 @@ export default class CustomSearch extends Component {
             total: data.count,
             //limit: data.limit,
             offset: params.offset,
-            data: data.rows
+            data: data.rows,
+            orderField, orderDirection
           }, () => {
             this.triggerEvt("loaded results, total: " + data.count);
             afterSearch(params);
