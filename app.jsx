@@ -135,7 +135,7 @@ export default class CustomSearch extends Component {
                     resolve(args);
                     // @TODO handle reject !
                 })
-            );
+            });
         });
     }
 
