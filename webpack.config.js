@@ -14,8 +14,12 @@ if(PROD) {
 module.exports = {
     entry: ['whatwg-fetch', './app.jsx'],
     output: {
-        path: __dirname,
-        filename: PROD ? 'app.build.min.js' : 'app.build.js'
+        path: __dirname + '/dist',
+        filename: PROD ? 'customsearch.min.js' : 'customsearch.js'
+    },
+    externals: {
+        // Use external version of React
+        "react": "React"
     },
     plugins: PROD ? [
         new webpack.DefinePlugin({
