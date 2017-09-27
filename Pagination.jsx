@@ -1,3 +1,8 @@
+/**
+ * Pagination component for react-customSearch
+ * @TODO: needs simplifying
+ */
+
 import React from 'react';
 
 const firstAndLastPage = ({current, side, pages}) => {
@@ -8,7 +13,9 @@ const firstAndLastPage = ({current, side, pages}) => {
     return [ first, last ];
 }
 
+// calculate offset from page (and limit)
 export const getOffset = (lim, p) => ~~lim * Math.max(~~p - 1, 0);
+// calculate page from offset (and limit)
 export const getPage = (lim, o) => 1 + Math.ceil(o / lim);
 
 function PageLink(limit, currentOffset, {page, text, onClick, disabled}) {
@@ -38,6 +45,9 @@ function PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate}) {
   return pageButtons;
 }
 
+/**
+ @param props {total, limit, offset, count, onPaginate}
+ */
 export default function Pagination(props) {
     let {total, limit} = props,
         pages = Math.floor(total / limit) + 1;

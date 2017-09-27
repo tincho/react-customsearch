@@ -1,3 +1,7 @@
+/**
+ * Result component for react-customsearch
+ */
+
 import React from 'react';
 import Pagination from './Pagination.jsx';
 
@@ -40,7 +44,7 @@ function ResultRow(props) {
       {cols, rowId, displayCols, fieldFormatters} = props,
       showColumn = displayCols.length
         ? columnName => displayCols.indexOf(columnName) !== -1
-        : () => true,
+        : () => true, // if no "displayCols" specified, all of then must be shown
       getValue     = columnName => get(cols, columnName),
       getFormatter = columnName => get(fieldFormatters, columnName, identity),
       formatValue  = columnName => {
@@ -70,7 +74,7 @@ export default function SearchResult(props) {
     orderDirection
   } = props;
 
-  let pagination = {
+  let paginationProps = {
     onPaginate,
     limit,
     offset,
@@ -87,35 +91,38 @@ export default function SearchResult(props) {
 
   // @TODO let action_ths = actions.map((action,i) => <th key={i}>{action}</th>); then render after data_ths
 
-  let noResultsText = 'Sin resultados',
+  let
+    noResultsText = 'Sin resultados',
     noResultsRow = (
       <tr>
         <td colSpan={cols.length} className="text-center">
           <span className="text-muted">{noResultsText}</span>
         </td>
       </tr>
-    );
-
-  let
+    ),
     count = rows.length,
     resume = (count > 0)
       ? <small className="text-muted">{(offset + 1) + ' - ' + (offset + count) + ' / ' + total}</small>
       : '',
-    data_rows = count
+    data_rows = (count > 0)
       ? rows.map((row, i) => <ResultRow row={i} key={i} cols={row} displayCols={cols} fieldFormatters={fieldFormatters} />)
-      : noResultsRow;
-
-  return (
-    <div>
-      <Pagination {...pagination} />
-      {resume}
+      : noResultsRow,
+    pagination = <Pagination {...paginationProps} />,
+    result = (
       <table className="table table-stripped table-bordered table-hover">
         <thead>
           <tr>{data_ths}</tr>
         </thead>
         <tbody>{data_rows}</tbody>
       </table>
-      <Pagination {...pagination} />
+    );
+
+  return (
+    <div className="customsearch--result">
+      {pagination}
+      {resume}
+      {result}
+      {pagination}
     </div>
   );
 }

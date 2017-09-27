@@ -1,3 +1,8 @@
+/**
+ * Entry point for react-customsearch
+ * @exports <CustomSearch /> react-customsearch
+ */
+
 import React, {Component} from 'react';
 
 import fetchJSON from './Helpers/fetchJson.js';
@@ -136,7 +141,7 @@ export default class CustomSearch extends Component {
             }).then(pushLocation);
         };
         return (
-            <div>
+            <div className="customsearch">
                 <div className="well">
                     <SearchForm onSubmit={formSubmit} formRef={(form) => { this.form = form }} />
                 </div>
