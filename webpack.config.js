@@ -9,18 +9,19 @@ if(PROD) {
         }
     });
 }
-//new webpack.optimize.UglifyJsPlugin();
 
 module.exports = {
-    entry: ['whatwg-fetch', './app.jsx'],
+    entry: ['whatwg-fetch', './src/CustomSearch.jsx'],
     output: {
-        path: __dirname + '/dist',
-        filename: PROD ? 'customsearch.min.js' : 'customsearch.js'
+        path: path.join(__dirname, 'dist'),
+        filename: PROD ? 'customsearch.min.js' : 'customsearch.js',
+        libraryTarget: 'umd',
+        library: 'CustomSearch'
     },
-    externals: {
+    /*externals: {
         // Use external version of React
         "react": "React"
-    },
+    },*/
     plugins: PROD ? [
         new webpack.DefinePlugin({
             'process.env': {

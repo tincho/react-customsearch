@@ -2,13 +2,13 @@
   "name": "react-customsearch",
   "version": "1.0.0",
   "description": "",
-  "main": "app.jsx",
+  "main": "dist/customsearch.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "PROD_ENV=1 node node_modules/webpack/bin/webpack.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "history": "^4.6.3",
     "query-string": "^5.0.0",
