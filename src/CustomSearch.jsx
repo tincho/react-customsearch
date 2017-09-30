@@ -4,18 +4,16 @@
  */
 
 import React, {Component} from 'react';
-
 import fetchJSON from './Helpers/fetchJson.js';
 
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
 import { getOffset, getPage } from './Pagination.jsx';
+const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 
 import querystring from 'query-string';
 import createHistory from 'history/createBrowserHistory'
 const history = createHistory();
-const get = (haystack, needle, spoon) => haystack[needle] || spoon;
-
 const pushLocation = args => {
     history.push('?' + querystring.stringify(args), args);
 }
