@@ -18,10 +18,11 @@ module.exports = {
         libraryTarget: 'umd',
         library: 'CustomSearch'
     },
-    /*externals: {
+    /* externals: {
+        // @TODO tweak the tweaks for thiz to work
         // Use external version of React
         "react": "React"
-    },*/
+    }, */
     plugins: PROD ? [
         new webpack.DefinePlugin({
             'process.env': {
