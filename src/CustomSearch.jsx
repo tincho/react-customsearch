@@ -18,7 +18,7 @@ const pushLocation = args => {
     history.push('?' + querystring.stringify(args), args);
 }
 
-export default class CustomSearch extends Component {
+class CustomSearch extends Component {
 
     constructor(props) {
         super(props);
@@ -162,3 +162,5 @@ export default class CustomSearch extends Component {
         );
     }
 }
+
+module.exports = CustomSearch;
