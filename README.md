@@ -17,12 +17,35 @@ Search form simply performs GET requests to the specified endpoint
 
 ## Usage
 
-```jsx
-<CustomSearch
-  src="http://my.server/customsearch"
-  columnNames={ field1: "Label 1", field2: "Label 2", ... }
-  fieldFormatters={ field1: value => value.replace("exam", "ple") }
- />
+```html
+<!-- provide mountpoint -->
+<div id="customSearch"></div>
+...
+<!-- include react and react-dom from CDN or locally -->
+<script src="react.js"></script>
+<script src="react-dom.js"></script>
+<!-- include CustomSearch -->
+<script src="customsearch.min.js"></script>
+<!-- setup and render -->
+<script type="text/javascript">
+var options = {
+  // the backend path
+  src: "/api/v1",
+  // OPTIONAL column names
+  columnNames: {
+    title: "The Title",
+    someField: "Field Number 1"
+  },
+  // OPTIONAL formatters/modifiers for fields content
+  fieldFormatters: {
+    title: function(value) {
+      return " [ " + value + " ]";
+    }
+  },
+  limit: 20
+};
+ReactDOM.render(React.createElement(CustomSearch, {options: options}), document.querySelector("#customSearch"));
+</script>
 ```
 
 # License
