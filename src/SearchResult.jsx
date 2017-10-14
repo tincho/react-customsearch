@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import Pagination from './Pagination.jsx';
+import Pagination, {getOffset} from './Pagination.jsx';
 
 const identity = v => v;
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
@@ -63,7 +63,7 @@ export default function SearchResult(props) {
     rows,
 
     limit = 20,
-    offset = 0,
+    page = 1,
     total,
 
     onPaginate,
@@ -77,7 +77,7 @@ export default function SearchResult(props) {
   let paginationProps = {
     onPaginate,
     limit,
-    offset,
+    page,
     total,
     count: rows.length || 0
   };
@@ -92,6 +92,7 @@ export default function SearchResult(props) {
   // @TODO let action_ths = actions.map((action,i) => <th key={i}>{action}</th>); then render after data_ths
 
   let
+    offset = getOffset(limit, page),
     noResultsText = 'Sin resultados',
     noResultsRow = (
       <tr>

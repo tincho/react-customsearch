@@ -8,7 +8,6 @@ import fetchJSON from './Helpers/fetchJson.js';
 
 import SearchForm from './SearchForm.jsx';
 import SearchResult from './SearchResult.jsx';
-import { getOffset, getPage } from './Pagination.jsx';
 const get = (haystack, needle, spoon) => haystack[needle] || spoon;
 
 import querystring from 'query-string';
@@ -33,7 +32,7 @@ class CustomSearch extends Component {
             type: "any",
             total: 0,
             limit: parseInt(props.options.limit, 10) || 20,
-            offset: 0,
+            page: 1,
             orderField: "",
             orderDirection: ""
         };
@@ -52,8 +51,7 @@ class CustomSearch extends Component {
             return;
         }
         let args = querystring.parse(search),
-            { q, type, page, order = "" } = args,
-            offset = getOffset(this.state.limit, page);
+            { q, type, page, order = "" } = args;
 
         // set url params to DOM elements
         this.form.q.value = q;
@@ -65,7 +63,7 @@ class CustomSearch extends Component {
         ] = order.match(/(\w+)\s+(ASC|DESC)/) || "  ";
 
         this.loadResults({
-            offset,
+            page,
             order: { orderField, orderDirection }
         });
     }
@@ -75,24 +73,14 @@ class CustomSearch extends Component {
           .then(cols => this.setState({cols}));
     }
 
-    loadResults({ offset, order }) {
-        if (typeof offset === 'undefined') {
-            offset = this.state.offset;
-        }
-
-        let { q, type } = this.form;
-        q = q.value;
-        type = Array.from(type).find(i => i.checked).value || 'any';
-
+    loadResults({ page = 1, order }) {
         let
-          params = {
-              q, type,
-              offset
-          },
-          { orderField, orderDirection } = order || this.state;
-
+          q = this.form.q.value,
+          type = Array.from(this.form.type).find(i => i.checked).value || 'any',
+          params = { q, type, page },
+          { orderField, orderDirection } = order || this.state,
+          orderStr = orderField + " " + orderDirection;
         // conditionally add order:
-        let orderStr = orderField + " " + orderDirection;
         if (orderStr.replace(/\s/g, "") !== "") {
             params.order = orderStr;
         }
@@ -102,16 +90,13 @@ class CustomSearch extends Component {
             fetchJSON(this.src + `search?${search}`).then(data => {
                 this.setState({
                     q, type,
+                    orderField, orderDirection,
                     loading: false,
                     total: data.count,
-                    //limit: data.limit,
-                    offset: params.offset,
-                    data: data.rows,
-                    orderField, orderDirection
+                    page: params.page,
+                    data: data.rows
                 }, () => {
                     let args = Object.assign({}, params);
-                    delete args.offset;
-                    args.page = getPage(this.state.limit, params.offset);
                     resolve(args);
                     // @TODO handle reject !
                 })
@@ -121,27 +106,27 @@ class CustomSearch extends Component {
 
     render() {
         // @TODO implement REDUX pattern (and library)
-        let formSubmit = (evt) => {
+        const onSearch = evt => {
             evt.preventDefault();
             this.loadResults({
-                offset: 0,
+                page: 1,
                 order: { orderField: "", orderDirection: "" }
             }).then(pushLocation);
         };
-        let onPaginate = (offset) => {
-            offset = this.form.type.value === this.state.type ? offset : 0;
-            this.loadResults({ offset }).then(pushLocation);
+        const onPaginate = page => {
+            page = this.form.type.value === this.state.type ? page : 1;
+            this.loadResults({ page }).then(pushLocation);
         }
-        let onChangeOrder = (orderField, orderDirection) => {
+        const onChangeOrder = (orderField, orderDirection) => {
             this.loadResults({
-                offset: 0,
+                page: 1,
                 order: { orderField, orderDirection }
             }).then(pushLocation);
         };
         return (
             <div className="customsearch">
                 <div className="well">
-                    <SearchForm onSubmit={formSubmit} formRef={(form) => { this.form = form }} />
+                    <SearchForm onSubmit={onSearch} formRef={(form) => { this.form = form }} />
                 </div>
                 <SearchResult
                     onPaginate={onPaginate}
@@ -150,7 +135,7 @@ class CustomSearch extends Component {
 
                     total={parseInt(this.state.total, 10)}
                     limit={parseInt(this.state.limit, 10)}
-                    offset={parseInt(this.state.offset, 10)}
+                    page={parseInt(this.state.page, 10)}
 
                     orderField={this.state.orderField}
                     orderDirection={this.state.orderDirection}
@@ -163,4 +148,5 @@ class CustomSearch extends Component {
     }
 }
 
+// using this export method because of some webpack thing
 module.exports = CustomSearch;

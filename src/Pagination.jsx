@@ -16,18 +16,27 @@ const firstAndLastPage = ({current, side, pages}) => {
 // calculate offset from page (and limit)
 export const getOffset = (lim, p) => ~~lim * Math.max(~~p - 1, 0);
 // calculate page from offset (and limit)
-export const getPage = (lim, o) => 1 + Math.ceil(o / lim);
+// export const getPage = (lim, o) => 1 + Math.ceil(o / lim);
 
-function PageLink(limit, currentOffset, {page, text, onClick, disabled}) {
-  let newOffset = getOffset(limit, page),
-      isCurrent = !text && newOffset === currentOffset;
-  return (<li className={disabled && 'disabled' || isCurrent && 'active'}>
-      <a onClick={ () => onClick(newOffset) } className={(isCurrent || disabled) && 'disabled'} href="#">{text || page}</a>
+function PaginationLink(limit, currentPage, onClick, {page, text, disabled}) {
+  let isCurrent = !text && page === currentPage,
+      liClass = disabled
+        ? 'disabled' :
+        isCurrent
+          ? 'active'
+          : '',
+      aClass = (isCurrent || disabled)
+        ? 'disabled'
+        : '';
+  return (<li className={liClass}>
+      <a onClick={ () => onClick(page) } className={aClass} href="#">{text || page}</a>
   </li>);
 }
 
-function PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate}) {
-  let pageButtons = [], hellip = <li key={+new Date()} className="disabled"><a>&hellip;</a></li>;
+function PageNumbers({firstPage, lastPage, pages, Link}) {
+  let
+    pageButtons = [],
+    hellip = <li key={+new Date()} className="disabled"><a>&hellip;</a></li>;
   for (let page = firstPage; page <= lastPage; page++) {
       let moreBefore = (page > 1),
           moreAfter  = (pages > lastPage);
@@ -35,8 +44,8 @@ function PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate}) {
            pageButtons.push(hellip)
       }
 
-      let btnProps = { page, onClick: onPaginate, key: page };
-      pageButtons.push(<PaginationLink {...btnProps} />);
+      let btnProps = { page, key: page };
+      pageButtons.push(<Link {...btnProps} />);
 
       if ( page == lastPage && moreAfter ) {
           pageButtons.push(hellip)
@@ -46,7 +55,7 @@ function PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate}) {
 }
 
 /**
- @param props {total, limit, offset, count, onPaginate}
+ @param props {total, limit, page, count, onPaginate}
  */
 export default function Pagination(props) {
     let {total, limit} = props,
@@ -57,25 +66,26 @@ export default function Pagination(props) {
     }
 
     let
-      {offset, count, onPaginate} = props,
-      current = getPage(limit, offset),
-      prev = Math.max(1, current - 1),
-      next = Math.min(pages, current + 1);
+      {page, count, onPaginate} = props,
+      prev = Math.max(1, page - 1),
+      next = Math.min(pages, page + 1),
+      [
+        firstPage = 1,
+        lastPage = pages
+      ] = firstAndLastPage({current: page, pages, side: 2});
 
-    const PaginationLink = props => PageLink(limit, offset, props);
+    const Link = PaginationLink.bind(null, limit, page, onPaginate);
 
-    let [firstPage = 1, lastPage = pages] = firstAndLastPage({pages, current, side: 2});
-
-    let pageButtons = PageNumbers({firstPage, lastPage, pages, PaginationLink, onPaginate});
+    let pageButtons = PageNumbers({firstPage, lastPage, pages, Link});
 
     return (
         <div>
           <ul className="pagination">
-            <PaginationLink text="&laquo;" onClick={onPaginate} page="1" disabled={current === 1} />
-            <PaginationLink text="&lsaquo;" onClick={onPaginate} page={prev} disabled={current === 1} />
+            <Link text="&laquo;" page="1" disabled={page === 1} />
+            <Link text="&lsaquo;" page={prev} disabled={page === 1} />
             {pageButtons}
-            <PaginationLink text="&rsaquo;" onClick={onPaginate} page={next} disabled={current === pages} />
-            <PaginationLink text="&raquo;" onClick={onPaginate} page={pages} disabled={current === pages} />
+            <Link text="&rsaquo;" page={next} disabled={page === pages} />
+            <Link text="&raquo;" page={pages} disabled={page === pages} />
           </ul>
         </div>
       );
